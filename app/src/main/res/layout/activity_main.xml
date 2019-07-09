@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <GridLayout
+        android:id="@+id/grid_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:useDefaultMargins="true"
+        android:columnCount="3"
+        android:rowCount="4">
+
+        <ImageButton
+            android:id="@+id/dice_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:background="@color/defaultImageButton"
+            android:contentDescription="@string/dice_one">
+        </ImageButton>
+        <ImageButton
+            android:id="@+id/dice_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:background="@color/defaultImageButton"
+            android:contentDescription="@string/dice_two">
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/dice_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:background="@color/defaultImageButton"
+            android:contentDescription="@string/dice_three"></ImageButton>
+        <ImageButton
+            android:id="@+id/dice_four"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:background="@color/defaultImageButton"
+            android:contentDescription="@string/dice_four">
+        </ImageButton>
+        <ImageButton
+            android:id="@+id/dice_five"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:background="@color/defaultImageButton"
+            android:contentDescription="@string/dice_five">
+        </ImageButton>
+        <ImageButton
+            android:id="@+id/dice_six"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            android:background="@color/defaultImageButton"
+            android:contentDescription="@string/dice_six">
+        </ImageButton>
+
+        <Spinner
+            android:id="@+id/selection_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            ></Spinner>
+
+        <Button
+            android:id="@+id/throw_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/throw_button"
+            ></Button>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_rowSpan="4"
+            android:layout_columnSpan="2">
+            <TextView
+                android:id="@+id/score_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ></TextView>
+            <TextView
+                android:id="@+id/throw_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </TextView>
+            <TextView
+                android:id="@+id/round_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </GridLayout>
+
+</android.support.constraint.ConstraintLayout>

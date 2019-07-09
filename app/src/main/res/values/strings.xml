@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Thirty Rounds</string>
+    <string name="dice_one">Dice value: 1</string>
+    <string name="dice_two">Dice value: 2</string>
+    <string name="dice_three">Dice value: 3</string>
+    <string name="dice_four">Dice value: 4</string>
+    <string name="dice_five">Dice value: 5</string>
+    <string name="dice_six">Dice value: 6</string>
+    <string name="throw_button">Roll dice</string>
+    <string name="default_value">Select value</string>
+    <string name="low_value">Low</string>
+    <string name="four_value">4</string>
+    <string name="five_value">5</string>
+    <string name="six_value">6</string>
+    <string name="seven_value">7</string>
+    <string name="eight_value">8</string>
+    <string name="nine_value">9</string>
+    <string name="ten_value">10</string>
+    <string name="eleven_value">11</string>
+    <string name="twelve_value">12</string>
+    <string name="current_score">Score: </string>
+    <string name="current_throw">Throw: </string>
+
+</resources>
