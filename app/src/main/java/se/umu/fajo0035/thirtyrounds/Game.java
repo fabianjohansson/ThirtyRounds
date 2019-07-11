@@ -9,14 +9,23 @@ public class Game {
     private int mThrowCounter = 0;
     private int mRoundCounter = 0;
     private int[] dices = new int[7];
-    private int sum = 0;
-
-    public void setSelectedDices(int[] selectedDices) {
-        this.selectedDices = selectedDices;
-    }
-
+    private int sum;
     private int[] selectedDices = new  int[7];
 
+    public int getSum() {
+        return sum;
+    }
+
+    public void setSum(int sum) {
+        this.sum = sum;
+    }
+
+    public void setSelectedDices(int[] selectedDices) {
+        System.out.println("Test av setSelectedDice()");
+        this.selectedDices = selectedDices;
+        System.out.println("selectedDicesArray: " + selectedDices[0] + "," + selectedDices[1] + "," + selectedDices[2] + "," + selectedDices[3] +
+                "," + selectedDices[4] + "," + selectedDices[5] + "," + selectedDices[6]);
+    }
 
     public int[] getSelectedDices() {
         return selectedDices;
@@ -38,6 +47,7 @@ public class Game {
     public void setmRoundCounter(int mRoundCounter) {
         this.mRoundCounter = mRoundCounter;
     }
+
     public int increasemRoundCounter () {
         if(checkNewRound()) {
             return mRoundCounter ++;
@@ -52,6 +62,9 @@ public class Game {
         }else {
             return false;
         }
+    }
+    public void setDices(int[] dices) {
+        this.dices = dices;
     }
     public int[] getDices() {
         return dices;
@@ -89,16 +102,39 @@ public class Game {
         sum = 0;
     }
 
-    public boolean verifySelectedDices(int i) {
-        //int sum = 0;
+    public boolean verifySelectedDices(int dropDownIndex) {
+        setSum(0);
+        if(dropDownIndex == 3 ){
+            return verifyLowSelected(dropDownIndex);
+        }else{
+            return verifyNotLowNotSelected(dropDownIndex);
+        }
+
+    }
+    public boolean verifyNotLowNotSelected(int valueOfSelection) {
+        System.out.println("valueOfSelection: " + valueOfSelection);
         for(int dice: selectedDices) {
             sum += dice;
         }
-        if(sum == i || sum == i * 2 || sum == i * 3 || sum == i * 4 || sum == i * 5 || sum == i * 6){
+        System.out.println("sum: " + sum);
+        if( sum == valueOfSelection || sum == valueOfSelection * 2 || sum == valueOfSelection * 3 || sum == valueOfSelection * 4 || sum == valueOfSelection * 5 || sum == valueOfSelection * 6){
             return true;
         }else{
             return false;
         }
     }
+
+    public boolean verifyLowSelected(int valueOfSelection) {
+        for(int dice: selectedDices) {
+            if(dice > 3){
+                return false;
+            }else {
+                sum += dice;
+            }
+        }
+        return true;
+    }
+
+
 }
 

@@ -1,5 +1,7 @@
 package se.umu.fajo0035.thirtyrounds;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -42,25 +44,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     };
     private ArrayList<String> mSelectableValues;
     private ArrayAdapter<String> mAdapter;
-
+    static final String STATE_SCORE = "currentScore";
+    static final String STATE_ROUND = "currentRound";
+    static final String STATE_THROW = "currentThrow";
+    static final String STATE_DICE1 = "clickedBoolDice1";
+    static final String STATE_DICE2 = "clickedBoolDice2";
+    static final String STATE_DICE3 = "clickedBoolDice3";
+    static final String STATE_DICE4 = "clickedBoolDice4";
+    static final String STATE_DICE5 = "clickedBoolDice5";
+    static final String STATE_DICE6 = "clickedBoolDice6";
+    static final String STATE_DICE_VALUES = "valueOfDices";
+    static final String END_RESULT = "finalScore";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         game = new Game();
         mThrowCounter = (TextView)findViewById(R.id.throw_display);
-        mThrowCounter.setText("Throw: ");
-
         mScoreCounter = (TextView)findViewById(R.id.score_display);
-        mScoreCounter.setText("Score: ");
-
         mRoundCounter = (TextView)findViewById(R.id.round_display);
-        mRoundCounter.setText("Round: ");
 
-
+        //updateStringDisplays();
+        mScoreCounter.setText("Score: " + Integer.toString(game.getmScoreCounter()));
+        mRoundCounter.setText("Round " + Integer.toString(game.getmRoundCounter()));
+        mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
 
         mSelectionSpinner = findViewById(R.id.selection_spinner);
 
@@ -84,12 +95,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mSelectionSpinner.setEnabled(false);
 
 
-
         mThrowButton = findViewById(R.id.throw_button);
+        mThrowButton.setText(R.string.throw_button);
         mThrowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //For throwing randomized dices
+                if(game.getmThrowCounter() == 30){
+                    Intent resultIntent = new Intent(MainActivity.this,ResultActivity.class);
+                    resultIntent.putExtra(END_RESULT,game.getmScoreCounter());
+                    startActivity(resultIntent);
+                }
                 game.increasemThrowcounter();
                 mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
                 game.increasemRoundCounter();
@@ -158,6 +174,48 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(STATE_SCORE, game.getmScoreCounter());
+        savedInstanceState.putInt(STATE_ROUND, game.getmRoundCounter());
+        savedInstanceState.putInt(STATE_THROW, game.getmThrowCounter());
+        //needs to store dices & diceImageBooleans aswell
+        savedInstanceState.putBoolean(STATE_DICE1,mClickedImageButtons.get(1));
+        savedInstanceState.putBoolean(STATE_DICE2,mClickedImageButtons.get(2));
+        savedInstanceState.putBoolean(STATE_DICE3,mClickedImageButtons.get(3));
+        savedInstanceState.putBoolean(STATE_DICE4,mClickedImageButtons.get(4));
+        savedInstanceState.putBoolean(STATE_DICE5,mClickedImageButtons.get(5));
+        savedInstanceState.putBoolean(STATE_DICE6,mClickedImageButtons.get(6));
+
+        savedInstanceState.putIntArray(STATE_DICE_VALUES, game.getDices());
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+    public void onRestoreInstanceState (Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        game.setmScoreCounter(savedInstanceState.getInt(STATE_SCORE));
+        game.setmRoundCounter(savedInstanceState.getInt(STATE_ROUND));
+        game.setmThrowCounter(savedInstanceState.getInt(STATE_THROW));
+
+        mClickedImageButtons.put(1,savedInstanceState.getBoolean(STATE_DICE1));
+        mClickedImageButtons.put(2,savedInstanceState.getBoolean(STATE_DICE2));
+        mClickedImageButtons.put(3,savedInstanceState.getBoolean(STATE_DICE3));
+        mClickedImageButtons.put(4,savedInstanceState.getBoolean(STATE_DICE4));
+        mClickedImageButtons.put(5,savedInstanceState.getBoolean(STATE_DICE5));
+        mClickedImageButtons.put(6,savedInstanceState.getBoolean(STATE_DICE6));
+
+        game.setDices(savedInstanceState.getIntArray(STATE_DICE_VALUES));
+        updateStringDisplays();
+        updateDiceImages();
+        refreshImageButton(1,mImageButton1);
+        refreshImageButton(2,mImageButton2);
+        refreshImageButton(3,mImageButton3);
+        refreshImageButton(4,mImageButton4);
+        refreshImageButton(5,mImageButton5);
+        refreshImageButton(6,mImageButton6);
+    }
     private void generateDices() {
         //for generating random dice values when rolled and saving clicked dices
         for (int i = 1;i < game.getDices().length; i++){
@@ -169,6 +227,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if(game.getmThrowCounter() == 30){
+            mThrowButton.setText(R.string.game_over);
+        }
+
         if (position != 0) {
             //Iterate over clicked Images to calculate score
             for (int i = 1; i < game.getDices().length; i++) {
@@ -227,6 +289,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void removeImageButtonColor(ImageButton imageButton) {
         imageButton.setBackgroundColor(getResources().getColor(android.R.color.white));
     }
+    private void refreshImageButton(int clickedIndex, ImageButton imageButton){
+        if(mClickedImageButtons.get(clickedIndex)){
+            setImageButtonColor(imageButton);
+        }
+    }
     private void toggleImageButton(int i, ImageButton imageButton) {
         if(mClickedImageButtons.get(i)) {
             removeImageButtonColor(imageButton);
@@ -249,10 +316,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         removeImageButtonColor(mImageButton5);
         removeImageButtonColor(mImageButton6);
 
-        System.out.println("selected dices length: " + game.getSelectedDices().length);
         int[] emptyArray = {0,0,0,0,0,0,0};
-        System.out.println("empty array length: " + emptyArray.length);
         game.setSelectedDices(emptyArray);
+
+    }
+
+    private void updateStringDisplays() {
+        mScoreCounter.setText("Score: " + Integer.toString(game.getmScoreCounter()));
+        mRoundCounter.setText("Round " + Integer.toString(game.getmRoundCounter()));
+        mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
+        //mThrowButton.setText(R.string.throw_button);
     }
 
 

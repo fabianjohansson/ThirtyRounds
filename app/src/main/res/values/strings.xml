@@ -20,5 +20,7 @@
     <string name="twelve_value">12</string>
     <string name="current_score">Score: </string>
     <string name="current_throw">Throw: </string>
+    <string name="game_over">See result</string>
+    <string name="result_text">Your result is:</string>
 
 </resources>
