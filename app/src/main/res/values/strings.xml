@@ -22,5 +22,8 @@
     <string name="current_throw">Throw: </string>
     <string name="game_over">See result</string>
     <string name="result_text">Your result is:</string>
+    <string name="saved_dice">saved</string>
+    <string name="selected_dice">selected</string>
+    <string name="new_game">Play again?</string>
 
 </resources>

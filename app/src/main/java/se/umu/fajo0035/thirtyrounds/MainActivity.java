@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
+import org.w3c.dom.Text;
+
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -23,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView mScoreCounter;
     private TextView mRoundCounter;
     private Game game;
-    private Random random;
     private int[] diceImages = {
             R.drawable.white1,
             R.drawable.white2,
@@ -56,6 +57,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static final String STATE_DICE_VALUES = "valueOfDices";
     static final String END_RESULT = "finalScore";
 
+    private TextView diceOneText;
+    private TextView diceTwoText;
+    private TextView diceThreeText;
+    private TextView diceFourText;
+    private TextView diceFiveText;
+    private TextView diceSixText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +75,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mScoreCounter = (TextView)findViewById(R.id.score_display);
         mRoundCounter = (TextView)findViewById(R.id.round_display);
 
-        //updateStringDisplays();
-        mScoreCounter.setText("Score: " + Integer.toString(game.getmScoreCounter()));
-        mRoundCounter.setText("Round " + Integer.toString(game.getmRoundCounter()));
-        mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
+        updateCountersDisplay();
 
         mSelectionSpinner = findViewById(R.id.selection_spinner);
 
@@ -105,27 +109,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Intent resultIntent = new Intent(MainActivity.this,ResultActivity.class);
                     resultIntent.putExtra(END_RESULT,game.getmScoreCounter());
                     startActivity(resultIntent);
+                    MainActivity.this.finish();
                 }
                 game.increasemThrowcounter();
-                mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
+                //mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
                 game.increasemRoundCounter();
-                mRoundCounter.setText("Round: " + Integer.toString(game.getmRoundCounter()));
+                //mRoundCounter.setText("Round: " + Integer.toString(game.getmRoundCounter()));
+                updateCountersDisplay();
                 generateDices();
                 updateDiceImages();
                 mSelectionSpinner.setSelection(0);
                 if(game.checkNewRound()){
                     mSelectionSpinner.setEnabled(true);
                     mThrowButton.setClickable(false);
+                    removeAllDicesText();
+                    removeSelectedDices();
                 }
             }
         });
+        diceOneText = (TextView)findViewById(R.id.dice1_text_display);
+        diceTwoText = (TextView)findViewById(R.id.dice2_text_display);
+        diceThreeText = (TextView)findViewById(R.id.dice3_text_display);
+        diceFourText = (TextView)findViewById(R.id.dice4_text_display);
+        diceFiveText = (TextView)findViewById(R.id.dice5_text_display);
+        diceSixText = (TextView)findViewById(R.id.dice6_text_display);
 
         mImageButton1 = (ImageButton)findViewById(R.id.dice_one);
         mImageButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //for choosing to save or removing dice and to toggle color
-                toggleImageButton(1, mImageButton1);
+                toggleImageButton(1, mImageButton1,diceOneText);
             }
         });
 
@@ -134,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 //for choosing to save dice
-                toggleImageButton(2, mImageButton2);
+                toggleImageButton(2, mImageButton2,diceTwoText);
             }
         });
         mImageButton3 = (ImageButton)findViewById(R.id.dice_three);
@@ -142,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 //for choosing to save dice
-                toggleImageButton(3, mImageButton3);
+                toggleImageButton(3, mImageButton3,diceThreeText);
             }
         });
 
@@ -151,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 //for choosing to save dice
-                toggleImageButton(4,mImageButton4);
+                toggleImageButton(4,mImageButton4,diceFourText);
             }
         });
         mImageButton5 = (ImageButton)findViewById(R.id.dice_five);
@@ -159,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 //for choosing to save dice
-                toggleImageButton(5, mImageButton5);
+                toggleImageButton(5, mImageButton5,diceFiveText);
             }
         });
         mImageButton6 = (ImageButton)findViewById(R.id.dice_six);
@@ -167,13 +181,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 //for choosing to save dice
-                toggleImageButton(6, mImageButton6);
+                toggleImageButton(6, mImageButton6,diceSixText);
             }
         });
 
 
 
     }
+    private void throwButtonClicked() {}
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -207,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mClickedImageButtons.put(6,savedInstanceState.getBoolean(STATE_DICE6));
 
         game.setDices(savedInstanceState.getIntArray(STATE_DICE_VALUES));
-        updateStringDisplays();
+        updateCountersDisplay();
         updateDiceImages();
         refreshImageButton(1,mImageButton1);
         refreshImageButton(2,mImageButton2);
@@ -236,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             for (int i = 1; i < game.getDices().length; i++) {
                 if (mClickedImageButtons.get(i)) {
                     game.setSelectedDice(i, game.getDice(i));
-                    System.out.println("selected dice " + game.getSelectedDice(i));
                 }
             }
             if(game.verifySelectedDices(position + 2)){
@@ -245,16 +259,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mSelectableValues.set(position, " ");
                 mThrowButton.setClickable(true);
                 mSelectionSpinner.setEnabled(false);
-                mScoreCounter.setText("Score " + game.getmScoreCounter());
+                //mScoreCounter.setText("Score " + game.getmScoreCounter());
+                updateCountersDisplay();
                 removeSelectedDices();
+                removeAllDicesText();
+                removeAllImageButtonDrawables();
+                Toast correctSelectionToast = Toast.makeText(getApplicationContext(),
+                        "You gained " + Integer.toString(game.getSum()) + " points!", Toast.LENGTH_SHORT);
+                correctSelectionToast.show();
             }else{
-                Toast toast = Toast.makeText(getApplicationContext(),
+                Toast invalidSelectionToast = Toast.makeText(getApplicationContext(),
                         "Invalid selection, try again",
                         Toast.LENGTH_SHORT);
 
-                toast.show();
+                invalidSelectionToast.show();
                 mSelectionSpinner.setSelection(0);
                 removeSelectedDices();
+                removeAllDicesText();
             }
 
         }
@@ -283,6 +304,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int diceValue = game.getDice(index);
         imageButton.setImageResource(diceImages[diceValue - 1]);
     }
+    private void removeAllImageButtonDrawables(){
+        mImageButton1.setImageResource(0);
+        mImageButton2.setImageResource(0);
+        mImageButton3.setImageResource(0);
+        mImageButton4.setImageResource(0);
+        mImageButton5.setImageResource(0);
+        mImageButton6.setImageResource(0);
+    }
     private void setImageButtonColor(ImageButton imageButton) {
         imageButton.setBackgroundColor(getResources().getColor(android.R.color.background_dark));
     }
@@ -294,14 +323,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             setImageButtonColor(imageButton);
         }
     }
-    private void toggleImageButton(int i, ImageButton imageButton) {
+    private void toggleImageButton(int i, ImageButton imageButton, TextView textView) {
         if(mClickedImageButtons.get(i)) {
             removeImageButtonColor(imageButton);
+            removeDiceText(textView);
             mClickedImageButtons.put(i,false);
         }else if(!mClickedImageButtons.get(i)){
             setImageButtonColor(imageButton);
+            addDiceText(textView);
             mClickedImageButtons.put(i, true);
         }
+    }
+    private void addDiceText(TextView textView) {
+        if(game.checkNewRound()){
+            textView.setText(getString(R.string.selected_dice));
+        }else{
+            textView.setText(getString(R.string.saved_dice));
+        }
+    }
+    private void removeDiceText(TextView textView){
+        textView.setText("");
+    }
+    private void removeAllDicesText() {
+        diceOneText.setText("");
+        diceTwoText.setText("");
+        diceThreeText.setText("");
+        diceFourText.setText("");
+        diceFiveText.setText("");
+        diceSixText.setText("");
     }
 
     private void removeSelectedDices () {
@@ -321,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private void updateStringDisplays() {
+    private void updateCountersDisplay() {
         mScoreCounter.setText("Score: " + Integer.toString(game.getmScoreCounter()));
         mRoundCounter.setText("Round " + Integer.toString(game.getmRoundCounter()));
         mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));

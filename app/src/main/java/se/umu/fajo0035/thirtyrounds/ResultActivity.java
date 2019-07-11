@@ -1,13 +1,18 @@
 package se.umu.fajo0035.thirtyrounds;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class ResultActivity extends AppCompatActivity {
     private TextView resultDisplay;
+    private Button newGame;
     private int value;
     //Game game;
 
@@ -25,5 +30,15 @@ public class ResultActivity extends AppCompatActivity {
 
         resultDisplay = (TextView)findViewById(R.id.result_display);
         resultDisplay.setText("Your result is: " + Integer.toString(value));
+
+        newGame = (Button)findViewById(R.id.return_button);
+        newGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //for returning to main view
+                Intent returnIntent = new Intent(ResultActivity.this,MainActivity.class);
+                startActivity(returnIntent);
+            }
+        });
     }
 }

@@ -20,54 +20,131 @@
         android:columnCount="3"
         android:rowCount="4">
 
-        <ImageButton
-            android:id="@+id/dice_one"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|top"
-            android:background="@color/defaultImageButton"
-            android:contentDescription="@string/dice_one">
-        </ImageButton>
-        <ImageButton
-            android:id="@+id/dice_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|top"
-            android:background="@color/defaultImageButton"
-            android:contentDescription="@string/dice_two">
-        </ImageButton>
+            >
+            <ImageButton
+                android:id="@+id/dice_one"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/defaultImageButton"
+                android:contentDescription="@string/dice_one">
+            </ImageButton>
+            <TextView
+                android:id="@+id/dice1_text_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diceTextColor"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/dice_three"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|top"
-            android:background="@color/defaultImageButton"
-            android:contentDescription="@string/dice_three"></ImageButton>
-        <ImageButton
-            android:id="@+id/dice_four"
+            >
+            <ImageButton
+                android:id="@+id/dice_two"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/defaultImageButton"
+                android:contentDescription="@string/dice_two">
+            </ImageButton>
+            <TextView
+                android:id="@+id/dice2_text_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diceTextColor"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|top"
-            android:background="@color/defaultImageButton"
-            android:contentDescription="@string/dice_four">
-        </ImageButton>
-        <ImageButton
-            android:id="@+id/dice_five"
+            >
+            <ImageButton
+                android:id="@+id/dice_three"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/defaultImageButton"
+                android:contentDescription="@string/dice_three">
+            </ImageButton>
+            <TextView
+                android:id="@+id/dice3_text_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diceTextColor"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="start|top"
+            >
+            <ImageButton
+                android:id="@+id/dice_four"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/defaultImageButton"
+                android:contentDescription="@string/dice_four">
+            </ImageButton>
+            <TextView
+                android:id="@+id/dice4_text_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diceTextColor"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|top"
-            android:background="@color/defaultImageButton"
-            android:contentDescription="@string/dice_five">
-        </ImageButton>
-        <ImageButton
-            android:id="@+id/dice_six"
-            android:layout_width="wrap_content"
+            >
+            <ImageButton
+                android:id="@+id/dice_five"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/defaultImageButton"
+                android:contentDescription="@string/dice_five">
+            </ImageButton>
+            <TextView
+                android:id="@+id/dice5_text_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diceTextColor"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:layout_gravity="start|top"
-            android:background="@color/defaultImageButton"
-            android:contentDescription="@string/dice_six">
-        </ImageButton>
+            >
+            <ImageButton
+                android:id="@+id/dice_six"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/defaultImageButton"
+                android:contentDescription="@string/dice_six">
+            </ImageButton>
+            <TextView
+                android:id="@+id/dice6_text_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/diceTextColor"
+                android:textSize="20sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
         <Spinner
             android:id="@+id/selection_spinner"
