@@ -1,16 +1,29 @@
 package se.umu.fajo0035.thirtyrounds;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class Game {
     private int mScoreCounter = 0;
     private int mThrowCounter = 0;
     private int mRoundCounter = 0;
-    private int[] dices = new int[7];
+    private ArrayList<Dice> diceObjectsArray = new ArrayList<>();
+    private HashMap<Integer,Integer> correctDices = new HashMap<>();
     private int sum;
-    private int[] selectedDices = new  int[7];
+
+    public ArrayList<Dice> getDiceObjectsArray() {
+        return diceObjectsArray;
+    }
+
+    public void setDiceObjectsArray(ArrayList<Dice> diceObjectsArray) {
+        this.diceObjectsArray = diceObjectsArray;
+    }
+
+    public void generateNewDice(int i) {
+        diceObjectsArray.add(new Dice(i));
+    }
 
     public int getSum() {
         return sum;
@@ -19,22 +32,6 @@ public class Game {
     public void setSum(int sum) {
         this.sum = sum;
     }
-
-    public void setSelectedDices(int[] selectedDices) {
-        this.selectedDices = selectedDices;
-    }
-
-    public int[] getSelectedDices() {
-        return selectedDices;
-    }
-
-    public void setSelectedDice(int position, int value) {
-        this.selectedDices[position] = value;
-    }
-    public int getSelectedDice(int index) {
-        return selectedDices[index];
-    }
-
 
 
     public int getmRoundCounter() {
@@ -45,35 +42,24 @@ public class Game {
         this.mRoundCounter = mRoundCounter;
     }
 
-    public int increasemRoundCounter () {
-        if(checkNewRound()) {
-            return mRoundCounter ++;
-        }else{
+    public int increasemRoundCounter() {
+        if (checkNewRound()) {
+            return mRoundCounter++;
+        } else {
             return mRoundCounter;
         }
     }
-    public boolean checkNewRound () {
-        if(mThrowCounter == 3 || mThrowCounter == 6 || mThrowCounter == 9 || mThrowCounter == 12 || mThrowCounter == 15
-                || mThrowCounter == 18 || mThrowCounter == 21 || mThrowCounter == 24 || mThrowCounter == 27 || mThrowCounter == 30){
-            return true;
-        }else {
-            return false;
-        }
-    }
-    public void setDices(int[] dices) {
-        this.dices = dices;
-    }
-    public int[] getDices() {
-        return dices;
-    }
-    public int getDice(int index) {
-        return dices[index];
+
+    public boolean checkMaxRounds() {
+        return mRoundCounter == 10;
     }
 
-    public void setDice(int position , int value) {
-        this.dices[position] = value;
+    /*public boolean checkMaxThrows() {
+        return mThrowCounter < 3;
+    }*/
+    public boolean checkNewRound() {
+        return mThrowCounter == 3;
     }
-
 
     public int getmThrowCounter() {
         return mThrowCounter;
@@ -91,45 +77,153 @@ public class Game {
     public void setmScoreCounter(int mScoreCounter) {
         this.mScoreCounter = mScoreCounter;
     }
+
     public int increasemThrowcounter() {
-        return mThrowCounter ++;
+        if (mThrowCounter == 3) {
+            return mThrowCounter = 0;
+        } else {
+            return mThrowCounter++;
+        }
     }
+
     public void increasemScoreCounter() {
         mScoreCounter += sum;
         //sum = 0;
     }
 
-    public boolean verifySelectedDices(int dropDownIndex) {
+    public int calculateScore(int dropDownIndex) {
         setSum(0);
-        if(dropDownIndex == 3 ){
-            return verifyLowSelected(dropDownIndex);
-        }else{
-            return verifyLowNotSelected(dropDownIndex);
+        if (dropDownIndex == 3) {
+            return calculateLowSelected();
+        } else {
+            return calculateNotLowSelected(dropDownIndex);
         }
 
     }
-    public boolean verifyLowNotSelected(int valueOfSelection) {
-        for(int dice: selectedDices) {
-            sum += dice;
+
+    public int calculateLowSelected() {
+        setSum(0);
+        for (Dice dice : diceObjectsArray) {
+            if (dice.getValue() < 4) {
+                sum += dice.getValue();
+            }
         }
-        if( sum == valueOfSelection || sum == valueOfSelection * 2 || sum == valueOfSelection * 3 || sum == valueOfSelection * 4 || sum == valueOfSelection * 5 || sum == valueOfSelection * 6){
-            return true;
+        return sum;
+    }
+
+
+    public int calculateNotLowSelected(int valueOfSelection) {
+        ArrayList<Dice> combinations = new ArrayList<>();
+        int size = diceObjectsArray.size();
+        //Collections.sort(diceObjectsArray, Dice.DiceValue);
+        System.out.println("diceObjectArray before: " + diceObjectsArray.toString());
+        /*for(int k = 0; k < diceObjectsArray.size(); k++){
+            if(getDiceValue(k) == valueOfSelection) {
+                int value = getDiceValue(k);
+                int id = getDiceID(k);
+                correctDices.put(id,value);
+                diceObjectsArray.get(k).removeValue();
+            }
+        }*/
+        //System.out.println("diceObjectArray after: " + diceObjectsArray.toString());
+        //boolean[] exists = new boolean[size];
+
+        notLowHelper(combinations,diceObjectsArray,valueOfSelection);
+
+        System.out.println("diceObjectArray after: " + diceObjectsArray.toString());
+        /*for (Dice dice : correctDices) {
+            System.out.println("dice value: " + dice.getValue());
+            sum += dice.getValue();
+        }*/
+        for (Integer value : correctDices.values()) {
+            System.out.println("value: " + value);
+            sum += value;
+        }
+        System.out.println("sum after: " + sum);
+        System.out.println("correctDices after: " + correctDices.toString());
+        correctDices.clear();
+        return sum;
+    }
+
+    private void notLowHelper( ArrayList<Dice> combinations, ArrayList<Dice> diceObjectsArray, int desiredSum){
+        if(diceObjectsArray.isEmpty()){
+            if(checkContains(combinations) && getTotal(combinations) == desiredSum){
+                for(Dice d: combinations){
+                    correctDices.put(d.getID(),d.getValue());
+                    d.removeValue();
+                }
+            }
+
         }else{
+            Dice d = diceObjectsArray.get(0);
+            diceObjectsArray.remove(0);
+            System.out.println("diceObjectsArray first: " + diceObjectsArray.toString());
+
+            notLowHelper(combinations,diceObjectsArray,desiredSum);
+
+            combinations.add(d);
+            System.out.println("combinaitons first: " + combinations.toString());
+            notLowHelper(combinations,diceObjectsArray,desiredSum);
+
+            diceObjectsArray.add(0,d);
+            System.out.println("diceObejctsArray second: " + diceObjectsArray.toString());
+            combinations.remove(combinations.size() -1);
+            System.out.println("combinaitons second: " + combinations.toString());
+        }
+    }
+    private boolean checkContains(ArrayList<Dice> combinations) {
+        int[] exists = new int[combinations.size()];
+        for(int i = 0; i < combinations.size(); i++){
+            if(correctDices.containsKey(combinations.get(i).getID())){
+                exists[i] = 1;
+            }else{
+                exists[i] = 0;
+            }
+        }
+        int total = 0;
+        for(int j = 0; j < exists.length; j++){
+            total += exists[j];
+        }
+        if(total == 0){
+            return true;
+        }
+        else {
             return false;
         }
     }
 
-    public boolean verifyLowSelected(int valueOfSelection) {
-        for(int dice: selectedDices) {
-            if(dice > 3){
-                return false;
-            }else {
-                sum += dice;
-            }
+    private int getTotal(ArrayList<Dice> list) {
+        int total = 0;
+        for (Dice d : list) {
+            total += d.getValue();
         }
-        return true;
+        return total;
+    }
+
+    /*private void addCorrectDice(ArrayList<Dice> list) {
+        for (Dice dice : list) {
+            if (!correctDices.contains(dice)) {
+                correctDices.add(dice);
+                diceObjectsArray.remove(dice);
+            }
+
+        }
+    }*/
+
+
+        private int getDiceValue ( int index){
+            return diceObjectsArray.get(index).getValue();
+        }
+        private int getDiceID (int index) {
+        return diceObjectsArray.get(index).getID();
+        }
+        private boolean checkContainsDice (int id){
+            return correctDices.containsKey(id);
+        }
+
+
     }
 
 
-}
+
 

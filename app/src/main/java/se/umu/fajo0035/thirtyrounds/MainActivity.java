@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
-import org.w3c.dom.Text;
 
 import java.util.*;
 
@@ -15,12 +14,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private Button mThrowButton;
     private Spinner mSelectionSpinner;
-    private ImageButton mImageButton1;
-    private ImageButton mImageButton2;
-    private ImageButton mImageButton3;
-    private ImageButton mImageButton4;
-    private ImageButton mImageButton5;
-    private ImageButton mImageButton6;
     private TextView mThrowCounter;
     private TextView mScoreCounter;
     private TextView mRoundCounter;
@@ -31,38 +24,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             R.drawable.white3,
             R.drawable.white4,
             R.drawable.white5,
-            R.drawable.white6
+            R.drawable.white6,
     };
-    private HashMap<Integer, Boolean> mClickedImageButtons = new HashMap<Integer, Boolean> (){
-        {
-            put(1, false);
-            put(2, false);
-            put(3, false);
-            put(4, false);
-            put(5, false);
-            put(6, false);
-        }
+    private static final int[] diceButtonIDs = {
+            R.id.dice_one,
+            R.id.dice_two,
+            R.id.dice_three,
+            R.id.dice_four,
+            R.id.dice_five,
+            R.id.dice_six
     };
+    private ImageButton[] imageButtons = new ImageButton[diceButtonIDs.length];
     private ArrayList<String> mSelectableValues;
     private ArrayAdapter<String> mAdapter;
     static final String STATE_SCORE = "currentScore";
     static final String STATE_ROUND = "currentRound";
     static final String STATE_THROW = "currentThrow";
-    static final String STATE_DICE1 = "clickedBoolDice1";
-    static final String STATE_DICE2 = "clickedBoolDice2";
-    static final String STATE_DICE3 = "clickedBoolDice3";
-    static final String STATE_DICE4 = "clickedBoolDice4";
-    static final String STATE_DICE5 = "clickedBoolDice5";
-    static final String STATE_DICE6 = "clickedBoolDice6";
-    static final String STATE_DICE_VALUES = "valueOfDices";
     static final String END_RESULT = "finalScore";
+    static final String DICES_ARRAY = "dicesArrayList";
 
-    private TextView diceOneText;
-    private TextView diceTwoText;
-    private TextView diceThreeText;
-    private TextView diceFourText;
-    private TextView diceFiveText;
-    private TextView diceSixText;
+    private int[] diceTextIDs = {
+            R.id.dice1_text_display,
+            R.id.dice2_text_display,
+            R.id.dice3_text_display,
+            R.id.dice4_text_display,
+            R.id.dice5_text_display,
+            R.id.dice6_text_display,
+    };
+
+    private TextView[] diceTexts = new TextView[diceTextIDs.length];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,105 +96,60 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 //For throwing randomized dices
-                if(game.getmThrowCounter() == 30){
-                    Intent resultIntent = new Intent(MainActivity.this,ResultActivity.class);
-                    resultIntent.putExtra(END_RESULT,game.getmScoreCounter());
-                    startActivity(resultIntent);
-                    MainActivity.this.finish();
-                }
-                game.increasemThrowcounter();
-                //mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
-                game.increasemRoundCounter();
-                //mRoundCounter.setText("Round: " + Integer.toString(game.getmRoundCounter()));
-                updateCountersDisplay();
-                generateDices();
-                updateDiceImages();
-                mSelectionSpinner.setSelection(0);
-                if(game.checkNewRound()){
-                    mSelectionSpinner.setEnabled(true);
-                    mThrowButton.setClickable(false);
-                    removeAllDicesText();
-                    removeSelectedDices();
-                }
-            }
-        });
-        diceOneText = (TextView)findViewById(R.id.dice1_text_display);
-        diceTwoText = (TextView)findViewById(R.id.dice2_text_display);
-        diceThreeText = (TextView)findViewById(R.id.dice3_text_display);
-        diceFourText = (TextView)findViewById(R.id.dice4_text_display);
-        diceFiveText = (TextView)findViewById(R.id.dice5_text_display);
-        diceSixText = (TextView)findViewById(R.id.dice6_text_display);
+                throwButtonClicked();
 
-        mImageButton1 = (ImageButton)findViewById(R.id.dice_one);
-        mImageButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //for choosing to save or removing dice and to toggle color
-                toggleImageButton(1, mImageButton1,diceOneText);
-            }
-        });
-
-        mImageButton2 = (ImageButton)findViewById(R.id.dice_two);
-        mImageButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //for choosing to save dice
-                toggleImageButton(2, mImageButton2,diceTwoText);
-            }
-        });
-        mImageButton3 = (ImageButton)findViewById(R.id.dice_three);
-        mImageButton3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //for choosing to save dice
-                toggleImageButton(3, mImageButton3,diceThreeText);
-            }
-        });
-
-        mImageButton4 = (ImageButton)findViewById(R.id.dice_four);
-        mImageButton4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //for choosing to save dice
-                toggleImageButton(4,mImageButton4,diceFourText);
-            }
-        });
-        mImageButton5 = (ImageButton)findViewById(R.id.dice_five);
-        mImageButton5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //for choosing to save dice
-                toggleImageButton(5, mImageButton5,diceFiveText);
-            }
-        });
-        mImageButton6 = (ImageButton)findViewById(R.id.dice_six);
-        mImageButton6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //for choosing to save dice
-                toggleImageButton(6, mImageButton6,diceSixText);
             }
         });
 
 
+        for(int id = 0; id < diceTextIDs.length; id++){
+            diceTexts[id] = (TextView)findViewById(diceTextIDs[id]);
+        }
+
+            for(int i = 0; i < diceButtonIDs.length; i++){
+                final int button = i;
+                imageButtons[button] = (ImageButton)findViewById(diceButtonIDs[button]);
+                imageButtons[button].setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        //for choosing to save or removing dice and to toggle color
+                        toggleImageButton(button);
+                    }
+                });
+
+            }
 
     }
-    private void throwButtonClicked() {}
+    public void throwButtonClicked() {
+        game.increasemThrowcounter();
+        if(game.checkMaxRounds()){
+            goToResultView();
+        }else if(game.checkNewRound()){
+            mSelectionSpinner.setEnabled(true);
+            mThrowButton.setClickable(false);
+            removeAllDicesText();
+            removeSelectedDices();
+        }
+        generateDices();
+        updateDiceImages();
+        game.increasemRoundCounter();
+        updateCountersDisplay();
+        System.out.println("diceObjectArray length: " + game.getDiceObjectsArray().size());
+    }
+
+    public void goToResultView() {
+        Intent resultIntent = new Intent(MainActivity.this,ResultActivity.class);
+        resultIntent.putExtra(END_RESULT,game.getmScoreCounter());
+        startActivity(resultIntent);
+        MainActivity.this.finish();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putInt(STATE_SCORE, game.getmScoreCounter());
         savedInstanceState.putInt(STATE_ROUND, game.getmRoundCounter());
         savedInstanceState.putInt(STATE_THROW, game.getmThrowCounter());
-        //needs to store dices & diceImageBooleans aswell
-        savedInstanceState.putBoolean(STATE_DICE1,mClickedImageButtons.get(1));
-        savedInstanceState.putBoolean(STATE_DICE2,mClickedImageButtons.get(2));
-        savedInstanceState.putBoolean(STATE_DICE3,mClickedImageButtons.get(3));
-        savedInstanceState.putBoolean(STATE_DICE4,mClickedImageButtons.get(4));
-        savedInstanceState.putBoolean(STATE_DICE5,mClickedImageButtons.get(5));
-        savedInstanceState.putBoolean(STATE_DICE6,mClickedImageButtons.get(6));
-
-        savedInstanceState.putIntArray(STATE_DICE_VALUES, game.getDices());
+        savedInstanceState.putParcelableArrayList(DICES_ARRAY,game.getDiceObjectsArray());
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -214,52 +160,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         game.setmRoundCounter(savedInstanceState.getInt(STATE_ROUND));
         game.setmThrowCounter(savedInstanceState.getInt(STATE_THROW));
 
-        mClickedImageButtons.put(1,savedInstanceState.getBoolean(STATE_DICE1));
-        mClickedImageButtons.put(2,savedInstanceState.getBoolean(STATE_DICE2));
-        mClickedImageButtons.put(3,savedInstanceState.getBoolean(STATE_DICE3));
-        mClickedImageButtons.put(4,savedInstanceState.getBoolean(STATE_DICE4));
-        mClickedImageButtons.put(5,savedInstanceState.getBoolean(STATE_DICE5));
-        mClickedImageButtons.put(6,savedInstanceState.getBoolean(STATE_DICE6));
-
-        game.setDices(savedInstanceState.getIntArray(STATE_DICE_VALUES));
+        game.setDiceObjectsArray(savedInstanceState.<Dice>getParcelableArrayList(DICES_ARRAY));
         updateCountersDisplay();
         updateDiceImages();
-        refreshImageButton(1,mImageButton1);
-        refreshImageButton(2,mImageButton2);
-        refreshImageButton(3,mImageButton3);
-        refreshImageButton(4,mImageButton4);
-        refreshImageButton(5,mImageButton5);
-        refreshImageButton(6,mImageButton6);
+        refreshImageButtons();
     }
+
     private void generateDices() {
         //for generating random dice values when rolled and saving clicked dices
-        for (int i = 1;i < game.getDices().length; i++){
-            int randomDice = new Random().nextInt(6) + 1;
-            if(!mClickedImageButtons.get(i)){
-                game.setDice(i,randomDice);
+        if(game.getDiceObjectsArray().size() == 0){
+            for (int i = 0;i < 6; i++) {
+                game.generateNewDice(i);
+            }
+        }else {
+            for(Dice dice: game.getDiceObjectsArray()){
+                if(!dice.getClicked()){
+                    dice.setValue();
+                }
             }
         }
     }
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if(game.getmThrowCounter() == 30){
+        if(game.getmRoundCounter() == 10){
             mThrowButton.setText(R.string.game_over);
         }
 
         if (position != 0) {
-            //Iterate over clicked Images to calculate score
-            for (int i = 1; i < game.getDices().length; i++) {
-                if (mClickedImageButtons.get(i)) {
-                    game.setSelectedDice(i, game.getDice(i));
-                }
-            }
-            if(game.verifySelectedDices(position + 2)){
-                //game.increasemScoreCounter();
+            game.calculateScore(position + 2);
                 game.increasemScoreCounter();
                 mSelectableValues.set(position, " ");
                 mThrowButton.setClickable(true);
                 mSelectionSpinner.setEnabled(false);
-                //mScoreCounter.setText("Score " + game.getmScoreCounter());
                 updateCountersDisplay();
                 removeSelectedDices();
                 removeAllDicesText();
@@ -267,16 +199,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Toast correctSelectionToast = Toast.makeText(getApplicationContext(),
                         "You gained " + Integer.toString(game.getSum()) + " points!", Toast.LENGTH_SHORT);
                 correctSelectionToast.show();
-            }else{
-                Toast invalidSelectionToast = Toast.makeText(getApplicationContext(),
-                        "Invalid selection, try again",
-                        Toast.LENGTH_SHORT);
 
-                invalidSelectionToast.show();
-                mSelectionSpinner.setSelection(0);
-                removeSelectedDices();
-                removeAllDicesText();
-            }
 
         }
     }
@@ -286,95 +209,70 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
     private void updateDiceImages() {
-        ImageButton mImageButton1 = findViewById(R.id.dice_one);
-        setImageButtonDrawable(mImageButton1,1);
-        ImageButton mImageButton2 = findViewById(R.id.dice_two);
-        setImageButtonDrawable(mImageButton2,2);
-        ImageButton mImageButton3 = findViewById(R.id.dice_three);
-        setImageButtonDrawable(mImageButton3,3);
-        ImageButton mImageButton4 = findViewById(R.id.dice_four);
-        setImageButtonDrawable(mImageButton4,4);
-        ImageButton mImageButton5 = findViewById(R.id.dice_five);
-        setImageButtonDrawable(mImageButton5,5);
-        ImageButton mImageButton6 = findViewById(R.id.dice_six);
-        setImageButtonDrawable(mImageButton6,6);
+        int index = 0;
+        for(Dice dice: game.getDiceObjectsArray()){
+            int imageIndex = dice.getValue() -1;
+            imageButtons[index] = findViewById(diceButtonIDs[index]);
+            imageButtons[index].setImageResource(diceImages[imageIndex]);
+
+            diceTexts[index] = findViewById(diceTextIDs[index]);
+            if(dice.getClicked()){
+                diceTexts[index].setText("saved");
+            }
+            index++;
+        }
     }
-    private void setImageButtonDrawable(ImageButton imageButton,int index) {
-        //uses -1 because of avoiding arrayOutOfBounds
-        int diceValue = game.getDice(index);
-        imageButton.setImageResource(diceImages[diceValue - 1]);
-    }
+
+
     private void removeAllImageButtonDrawables(){
-        mImageButton1.setImageResource(0);
-        mImageButton2.setImageResource(0);
-        mImageButton3.setImageResource(0);
-        mImageButton4.setImageResource(0);
-        mImageButton5.setImageResource(0);
-        mImageButton6.setImageResource(0);
-    }
-    private void setImageButtonColor(ImageButton imageButton) {
-        imageButton.setBackgroundColor(getResources().getColor(android.R.color.background_dark));
-    }
-    private void removeImageButtonColor(ImageButton imageButton) {
-        imageButton.setBackgroundColor(getResources().getColor(android.R.color.white));
-    }
-    private void refreshImageButton(int clickedIndex, ImageButton imageButton){
-        if(mClickedImageButtons.get(clickedIndex)){
-            setImageButtonColor(imageButton);
+        for(ImageButton imageButton: imageButtons) {
+            imageButton.setImageResource(0);
         }
     }
-    private void toggleImageButton(int i, ImageButton imageButton, TextView textView) {
-        if(mClickedImageButtons.get(i)) {
-            removeImageButtonColor(imageButton);
-            removeDiceText(textView);
-            mClickedImageButtons.put(i,false);
-        }else if(!mClickedImageButtons.get(i)){
-            setImageButtonColor(imageButton);
-            addDiceText(textView);
-            mClickedImageButtons.put(i, true);
+
+      private void refreshImageButtons() {
+          int index = 0;
+          for(Dice dice: game.getDiceObjectsArray()){
+              if(dice.getClicked()){
+                  imageButtons[index].setBackgroundColor(getResources().getColor(android.R.color.background_dark));
+              }
+              index++;
+          }
+      }
+
+    private void toggleImageButton(int index) {
+        Dice dice = game.getDiceObjectsArray().get(index);
+        if(dice.getClicked() || game.checkNewRound()){
+            imageButtons[index].setBackgroundColor(getResources().getColor(android.R.color.white));
+            diceTexts[index].setText("");
+            dice.setClicked(false);
+        }else {
+            imageButtons[index].setBackgroundColor(getResources().getColor(android.R.color.background_dark));
+            diceTexts[index].setText("saved");
+            dice.setClicked(true);
         }
     }
-    private void addDiceText(TextView textView) {
-        if(game.checkNewRound()){
-            textView.setText(getString(R.string.selected_dice));
-        }else{
-            textView.setText(getString(R.string.saved_dice));
-        }
-    }
-    private void removeDiceText(TextView textView){
-        textView.setText("");
-    }
+
     private void removeAllDicesText() {
-        diceOneText.setText("");
-        diceTwoText.setText("");
-        diceThreeText.setText("");
-        diceFourText.setText("");
-        diceFiveText.setText("");
-        diceSixText.setText("");
+        for(TextView textView: diceTexts) {
+            textView.setText("");
+        }
     }
 
     private void removeSelectedDices () {
         //for removing selected dices
-        for (Map.Entry<Integer, Boolean> entry : mClickedImageButtons.entrySet()) {
-            entry.setValue(false);
+        for (Dice dice: game.getDiceObjectsArray()){
+            dice.setClicked(false);
         }
-        removeImageButtonColor(mImageButton1);
-        removeImageButtonColor(mImageButton2);
-        removeImageButtonColor(mImageButton3);
-        removeImageButtonColor(mImageButton4);
-        removeImageButtonColor(mImageButton5);
-        removeImageButtonColor(mImageButton6);
-
-        int[] emptyArray = {0,0,0,0,0,0,0};
-        game.setSelectedDices(emptyArray);
-
+        for(ImageButton imageButton: imageButtons){
+            imageButton.setBackgroundColor(getResources().getColor(android.R.color.white));
+        }
     }
 
     private void updateCountersDisplay() {
         mScoreCounter.setText("Score: " + Integer.toString(game.getmScoreCounter()));
-        mRoundCounter.setText("Round " + Integer.toString(game.getmRoundCounter()));
+        mRoundCounter.setText("Round: " + Integer.toString(game.getmRoundCounter()));
         mThrowCounter.setText("Throw: " + Integer.toString(game.getmThrowCounter()));
-        //mThrowButton.setText(R.string.throw_button);
     }
 
 
