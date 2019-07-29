@@ -46,19 +46,19 @@ public class Game {
         if (checkNewRound()) {
             return mRoundCounter++;
         } else {
-            return mRoundCounter;
+           return mRoundCounter;
         }
     }
 
     public boolean checkMaxRounds() {
-        return mRoundCounter == 10;
+        return mRoundCounter == 11;
     }
 
-    /*public boolean checkMaxThrows() {
-        return mThrowCounter < 3;
-    }*/
-    public boolean checkNewRound() {
+    public boolean checkMaxThrows() {
         return mThrowCounter == 3;
+    }
+    public boolean checkNewRound() {
+        return mThrowCounter == 1;
     }
 
     public int getmThrowCounter() {
@@ -80,7 +80,7 @@ public class Game {
 
     public int increasemThrowcounter() {
         if (mThrowCounter == 3) {
-            return mThrowCounter = 0;
+            return mThrowCounter = 1;
         } else {
             return mThrowCounter++;
         }
@@ -111,7 +111,8 @@ public class Game {
         return sum;
     }
 
-
+/**
+ * See Stanford video for comment help**/
     public int calculateNotLowSelected(int valueOfSelection) {
         ArrayList<Dice> combinations = new ArrayList<>();
         int size = diceObjectsArray.size();
@@ -147,7 +148,7 @@ public class Game {
 
     private void notLowHelper( ArrayList<Dice> combinations, ArrayList<Dice> diceObjectsArray, int desiredSum){
         if(diceObjectsArray.isEmpty()){
-            if(checkContains(combinations) && getTotal(combinations) == desiredSum){
+            if(getTotal(combinations) == desiredSum && checkContains(combinations)){
                 for(Dice d: combinations){
                     correctDices.put(d.getID(),d.getValue());
                     d.removeValue();

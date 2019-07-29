@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView mScoreCounter;
     private TextView mRoundCounter;
     private Game game;
+    private boolean seeResult = false;
     private int[] diceImages = {
             R.drawable.white1,
             R.drawable.white2,
@@ -105,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         for(int id = 0; id < diceTextIDs.length; id++){
             diceTexts[id] = (TextView)findViewById(diceTextIDs[id]);
         }
-
             for(int i = 0; i < diceButtonIDs.length; i++){
                 final int button = i;
                 imageButtons[button] = (ImageButton)findViewById(diceButtonIDs[button]);
@@ -122,17 +122,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     public void throwButtonClicked() {
         game.increasemThrowcounter();
-        if(game.checkMaxRounds()){
-            goToResultView();
-        }else if(game.checkNewRound()){
+        game.increasemRoundCounter();
+       if(game.checkMaxThrows()){
             mSelectionSpinner.setEnabled(true);
             mThrowButton.setClickable(false);
             removeAllDicesText();
-            removeSelectedDices();
+            removeImageButtonBackground();
+        }else if(game.checkMaxRounds() && seeResult){
+            goToResultView();
         }
         generateDices();
         updateDiceImages();
-        game.increasemRoundCounter();
         updateCountersDisplay();
         System.out.println("diceObjectArray length: " + game.getDiceObjectsArray().size());
     }
@@ -184,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if(game.getmRoundCounter() == 10){
             mThrowButton.setText(R.string.game_over);
+            mThrowButton.setClickable(true);
+            seeResult = true;
         }
 
         if (position != 0) {
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mSelectionSpinner.setEnabled(false);
                 updateCountersDisplay();
                 removeSelectedDices();
-                removeAllDicesText();
+                //removeAllDicesText();
                 removeAllImageButtonDrawables();
                 Toast correctSelectionToast = Toast.makeText(getApplicationContext(),
                         "You gained " + Integer.toString(game.getSum()) + " points!", Toast.LENGTH_SHORT);
@@ -242,20 +244,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void toggleImageButton(int index) {
         Dice dice = game.getDiceObjectsArray().get(index);
-        if(dice.getClicked() || game.checkNewRound()){
+        if(dice.getClicked() || game.checkMaxThrows()){
             imageButtons[index].setBackgroundColor(getResources().getColor(android.R.color.white));
             diceTexts[index].setText("");
             dice.setClicked(false);
         }else {
             imageButtons[index].setBackgroundColor(getResources().getColor(android.R.color.background_dark));
+            diceTexts[index].setVisibility(View.VISIBLE);
             diceTexts[index].setText("saved");
             dice.setClicked(true);
         }
     }
 
     private void removeAllDicesText() {
+        System.out.println("diceText length: " + diceTexts.length);
         for(TextView textView: diceTexts) {
-            textView.setText("");
+            textView.setVisibility(View.GONE);
         }
     }
 
@@ -264,10 +268,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         for (Dice dice: game.getDiceObjectsArray()){
             dice.setClicked(false);
         }
+
+    }
+    private void removeImageButtonBackground() {
         for(ImageButton imageButton: imageButtons){
+            System.out.println("ImageButton test!");
             imageButton.setBackgroundColor(getResources().getColor(android.R.color.white));
         }
     }
+   /* private void makeDicesUnclickable() {
+        for(ImageButton imageButton: imageButtons){
+            imageButton.setClickable(false);
+        }
+    }*/
 
     private void updateCountersDisplay() {
         mScoreCounter.setText("Score: " + Integer.toString(game.getmScoreCounter()));

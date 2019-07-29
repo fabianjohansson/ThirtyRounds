@@ -25,5 +25,6 @@
     <string name="saved_dice">saved</string>
     <string name="selected_dice">selected</string>
     <string name="new_game">Play again?</string>
+    <string name="empty_string">""</string>
 
 </resources>
