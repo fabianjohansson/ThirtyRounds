@@ -6,20 +6,36 @@ import android.os.Parcelable;
 import java.util.Comparator;
 import java.util.Random;
 
+/**
+ * Model for dices that implements Parcelable so that a dice can be saved
+ * with onSaveInstanceState when the application is in the background
+ * and retrieved with onRetrieveInstanceState when the application is back in the foreground
+ */
 public class Dice implements Parcelable{
+    /**
+     * @param id number for identifying the dice
+     * @param value number of the current value of the dice
+     * @param clicked boolean to indicate if the dice is to be saved
+     */
     private int id;
     private int value;
     private boolean clicked;
 
-    public Dice(int diceID/*, boolean clickedState, int currentValue*/){
+    /** creates an instance of dice
+     * @param diceID for identification
+     * value is generated randomly between numbers 1-6
+     * clicked is set default to false
+     */
+    public Dice(int diceID){
         id = diceID;
         value = throwDice();
         clicked = false;
-        /*clicked = clickedState;
-        value = currentValue;*/
     }
 
 
+    /**
+     * @return returns a random number between 1-6 for the value of the dice
+     */
     private int throwDice(){
         return new Random().nextInt(6) + 1;
     }
@@ -39,6 +55,10 @@ public class Dice implements Parcelable{
     public void setValue() {
         this.value = throwDice();
     }
+
+    /**
+     * sets the value of the dice to zero
+     */
     public void removeValue() {
         this.value = 0;
     }
@@ -47,14 +67,6 @@ public class Dice implements Parcelable{
     public String toString() {
         return "id: " + id + " value: " + value + " clicked: " + clicked;
     }
-    public static Comparator<Dice> DiceValue = new Comparator<Dice>() {
-        @Override
-        public int compare(Dice o1, Dice o2) {
-            int value1 = o1.getValue();
-            int value2 = o2.getValue();
-            return value2 - value1;
-        }
-    };
 
     @Override
     public int describeContents() {
@@ -67,6 +79,7 @@ public class Dice implements Parcelable{
         out.writeInt(value);
         out.writeValue(clicked);
     }
+    /* creator method for parcelable */
     public static final Parcelable.Creator<Dice> CREATOR = new Parcelable.Creator<Dice>() {
         public Dice createFromParcel(Parcel in) {
             return new Dice(in);

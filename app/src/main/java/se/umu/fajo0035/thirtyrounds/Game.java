@@ -2,27 +2,42 @@ package se.umu.fajo0035.thirtyrounds;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
+
+/**
+ * Model with all the values of a game and for calculating score
+ */
 public class Game {
+
+    /**
+     * @param mScoreCounter current score
+     * @param mThrowCounter current throw
+     * @param mRoundCounter current round
+     * @param dices all current dices in the game
+     * @param correctDices verified dices equal to the desired score calculation, key= dice.id, value= dice.value
+     * @param sum current sum of all correct dices
+     */
     private int mScoreCounter = 0;
     private int mThrowCounter = 0;
     private int mRoundCounter = 0;
-    private ArrayList<Dice> diceObjectsArray = new ArrayList<>();
+    private ArrayList<Dice> dices = new ArrayList<>();
     private HashMap<Integer,Integer> correctDices = new HashMap<>();
     private int sum;
 
-    public ArrayList<Dice> getDiceObjectsArray() {
-        return diceObjectsArray;
+    public ArrayList<Dice> getDices() {
+        return dices;
     }
 
-    public void setDiceObjectsArray(ArrayList<Dice> diceObjectsArray) {
-        this.diceObjectsArray = diceObjectsArray;
+    public void setDices(ArrayList<Dice> dices) {
+        this.dices = dices;
     }
 
+    /** adds a single dice in the collection of all dices
+     * @param i ID for creating new instance of dice
+     */
     public void generateNewDice(int i) {
-        diceObjectsArray.add(new Dice(i));
+        dices.add(new Dice(i));
     }
 
     public int getSum() {
@@ -42,6 +57,10 @@ public class Game {
         this.mRoundCounter = mRoundCounter;
     }
 
+    /**
+     * @return If there is a new round we increase the the round counter
+     * else we return the current value
+     */
     public int increasemRoundCounter() {
         if (checkNewRound()) {
             return mRoundCounter++;
@@ -50,13 +69,24 @@ public class Game {
         }
     }
 
+    /**
+     * @return If the current round is larger then 10 the maximum amount of rounds have been exceeded
+     */
     public boolean checkMaxRounds() {
-        return mRoundCounter == 11;
+        return mRoundCounter > 10;
     }
 
+    /**
+     * @return returns true when the max amount of throws, 3, have been reached else returns false
+     */
     public boolean checkMaxThrows() {
         return mThrowCounter == 3;
     }
+
+    /**
+     * @return If the throw counter is one a new round has started and true is returned
+     * else false is returned
+     */
     public boolean checkNewRound() {
         return mThrowCounter == 1;
     }
@@ -78,6 +108,9 @@ public class Game {
         this.mScoreCounter = mScoreCounter;
     }
 
+    /** Keeps the throw counter between 1-3
+     * @return if max amount of throws are made, 3, next throw will be 1 else we increment the current score by 1
+     */
     public int increasemThrowcounter() {
         if (mThrowCounter == 3) {
             return mThrowCounter = 1;
@@ -86,24 +119,33 @@ public class Game {
         }
     }
 
+    /**
+     * increases the total score from current sum
+     */
     public void increasemScoreCounter() {
         mScoreCounter += sum;
-        //sum = 0;
     }
 
-    public int calculateScore(int dropDownIndex) {
+
+    /** If the desired value for score calculation is 3 calculaLowSelected is run
+     * else calculateNotLowSelected is run
+     * @param selectedValue the user selected value to be calculated for score
+     */
+    public void calculateScore(int selectedValue) {
         setSum(0);
-        if (dropDownIndex == 3) {
-            return calculateLowSelected();
+        if (selectedValue == 3) {
+            calculateLowSelected();
         } else {
-            return calculateNotLowSelected(dropDownIndex);
+             calculateNotLowSelected(selectedValue);
         }
 
     }
 
+    /**
+     * @return sum of all the dices values that are less than or equal to 3
+     */
     public int calculateLowSelected() {
-        setSum(0);
-        for (Dice dice : diceObjectsArray) {
+        for (Dice dice : dices) {
             if (dice.getValue() < 4) {
                 sum += dice.getValue();
             }
@@ -111,44 +153,37 @@ public class Game {
         return sum;
     }
 
-/**
- * See Stanford video for comment help**/
-    public int calculateNotLowSelected(int valueOfSelection) {
+
+    /** To find subsets equal to the users selected value
+     * @param valueOfSelection value the user have selected
+     * @return the sum of all non duplicated dices values in subsets equal to the users selection
+     */
+    private int calculateNotLowSelected(int valueOfSelection) {
         ArrayList<Dice> combinations = new ArrayList<>();
-        int size = diceObjectsArray.size();
-        //Collections.sort(diceObjectsArray, Dice.DiceValue);
-        System.out.println("diceObjectArray before: " + diceObjectsArray.toString());
-        /*for(int k = 0; k < diceObjectsArray.size(); k++){
-            if(getDiceValue(k) == valueOfSelection) {
-                int value = getDiceValue(k);
-                int id = getDiceID(k);
-                correctDices.put(id,value);
-                diceObjectsArray.get(k).removeValue();
-            }
-        }*/
-        //System.out.println("diceObjectArray after: " + diceObjectsArray.toString());
-        //boolean[] exists = new boolean[size];
-
-        notLowHelper(combinations,diceObjectsArray,valueOfSelection);
-
-        System.out.println("diceObjectArray after: " + diceObjectsArray.toString());
-        /*for (Dice dice : correctDices) {
-            System.out.println("dice value: " + dice.getValue());
-            sum += dice.getValue();
-        }*/
+        notLowHelper(combinations, dices,valueOfSelection);
+        /* Calculates the sum of all  verified subsets */
         for (Integer value : correctDices.values()) {
-            System.out.println("value: " + value);
             sum += value;
         }
-        System.out.println("sum after: " + sum);
-        System.out.println("correctDices after: " + correctDices.toString());
+        /* Removes all elements from the verified dices before next round */
         correctDices.clear();
         return sum;
     }
 
-    private void notLowHelper( ArrayList<Dice> combinations, ArrayList<Dice> diceObjectsArray, int desiredSum){
-        if(diceObjectsArray.isEmpty()){
-            if(getTotal(combinations) == desiredSum && checkContains(combinations)){
+    /** Method that finds all combinations of dices values
+     * and outputs all subsets that equals the desired sum
+     * verifies that dices can be used only once
+     * @param combinations for storing all combinations of dice values
+     * @param diceObjects  contains all dice object
+     * @param desiredSum  desired value to be found in subsets of all dices
+     */
+    private void notLowHelper( ArrayList<Dice> combinations, ArrayList<Dice> diceObjects, int desiredSum){
+        //no more combinations can be made
+        if(diceObjects.isEmpty()){
+            /*if the subset combined sum equals the selected  value
+            * and none of the dices have been added to the correct dices
+            * we add the subset of dices to correct dices and sets the added dices value to zero*/
+            if(getTotal(combinations) == desiredSum && dicesAreNotUsed(combinations)){
                 for(Dice d: combinations){
                     correctDices.put(d.getID(),d.getValue());
                     d.removeValue();
@@ -156,43 +191,41 @@ public class Game {
             }
 
         }else{
-            Dice d = diceObjectsArray.get(0);
-            diceObjectsArray.remove(0);
-            System.out.println("diceObjectsArray first: " + diceObjectsArray.toString());
-
-            notLowHelper(combinations,diceObjectsArray,desiredSum);
-
+            //retrieves current first dice from collection
+            Dice d = diceObjects.get(0);
+            //removes current first dice in collection
+            diceObjects.remove(0);
+            //explores combinations without selected dice
+            notLowHelper(combinations,diceObjects,desiredSum);
+            //adds the selected dice to combinations
             combinations.add(d);
-            System.out.println("combinaitons first: " + combinations.toString());
-            notLowHelper(combinations,diceObjectsArray,desiredSum);
-
-            diceObjectsArray.add(0,d);
-            System.out.println("diceObejctsArray second: " + diceObjectsArray.toString());
+            //explores combinations with selected dice
+            notLowHelper(combinations,diceObjects,desiredSum);
+            //adds selected back to position in all dices
+            diceObjects.add(0,d);
+            //removes selected dice to be combined
             combinations.remove(combinations.size() -1);
-            System.out.println("combinaitons second: " + combinations.toString());
         }
     }
-    private boolean checkContains(ArrayList<Dice> combinations) {
-        int[] exists = new int[combinations.size()];
+
+    /**
+     * @param combinations contains subsets to be checked
+     * @return Returns false if a dice in the subset have been added to the correct dices.
+     *      Return true if non of the dices in the subset have been added to the correct dices
+     */
+    private boolean dicesAreNotUsed(ArrayList<Dice> combinations) {
         for(int i = 0; i < combinations.size(); i++){
             if(correctDices.containsKey(combinations.get(i).getID())){
-                exists[i] = 1;
-            }else{
-                exists[i] = 0;
+                return false;
             }
         }
-        int total = 0;
-        for(int j = 0; j < exists.length; j++){
-            total += exists[j];
-        }
-        if(total == 0){
-            return true;
-        }
-        else {
-            return false;
-        }
+        return true;
     }
 
+    /**
+     * @param list  contains dices to be calculated for sum of their values
+     * @return the total amount of all dices values in the collection
+     */
     private int getTotal(ArrayList<Dice> list) {
         int total = 0;
         for (Dice d : list) {
@@ -200,27 +233,6 @@ public class Game {
         }
         return total;
     }
-
-    /*private void addCorrectDice(ArrayList<Dice> list) {
-        for (Dice dice : list) {
-            if (!correctDices.contains(dice)) {
-                correctDices.add(dice);
-                diceObjectsArray.remove(dice);
-            }
-
-        }
-    }*/
-
-
-        private int getDiceValue ( int index){
-            return diceObjectsArray.get(index).getValue();
-        }
-        private int getDiceID (int index) {
-        return diceObjectsArray.get(index).getID();
-        }
-        private boolean checkContainsDice (int id){
-            return correctDices.containsKey(id);
-        }
 
 
     }
