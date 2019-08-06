@@ -10,19 +10,19 @@ import java.util.HashMap;
  */
 public class Game {
 
-    /**
-     * @param mScoreCounter current score
-     * @param mThrowCounter current throw
-     * @param mRoundCounter current round
-     * @param dices all current dices in the game
-     * @param correctDices verified dices equal to the desired score calculation, key= dice.id, value= dice.value
-     * @param sum current sum of all correct dices
-     */
+    /* current score */
     private int mScoreCounter = 0;
+    /* current throw */
     private int mThrowCounter = 0;
+    /* current round */
     private int mRoundCounter = 0;
+    /* all current dices in the game */
     private ArrayList<Dice> dices = new ArrayList<>();
+    /* verified dices equal to the desired score calculation, key= dice.id, value= dice.value */
     private HashMap<Integer,Integer> correctDices = new HashMap<>();
+    /* score for each selection, key= name of selection, value = score of the selection */
+    private HashMap<String,Integer> scoreEachRound = new HashMap<>();
+    /* current sum of all correct dices */
     private int sum;
 
     public ArrayList<Dice> getDices() {
@@ -126,17 +126,24 @@ public class Game {
         mScoreCounter += sum;
     }
 
+    public HashMap getScoreEachRound(){
+        return scoreEachRound;
+    }
+    public void setScoreEachRound(HashMap<String,Integer> scoreEachRound) {
+        this.scoreEachRound = scoreEachRound;
+    }
+
 
     /** If the desired value for score calculation is 3 calculaLowSelected is run
      * else calculateNotLowSelected is run
      * @param selectedValue the user selected value to be calculated for score
      */
-    public void calculateScore(int selectedValue) {
+    public void calculateScore(int selectedValue, String selectedName) {
         setSum(0);
         if (selectedValue == 3) {
-            calculateLowSelected();
+            calculateLowSelected(selectedName);
         } else {
-             calculateNotLowSelected(selectedValue);
+             calculateNotLowSelected(selectedValue,selectedName);
         }
 
     }
@@ -144,12 +151,13 @@ public class Game {
     /**
      * @return sum of all the dices values that are less than or equal to 3
      */
-    public int calculateLowSelected() {
+    public int calculateLowSelected(String selectedName) {
         for (Dice dice : dices) {
             if (dice.getValue() < 4) {
                 sum += dice.getValue();
             }
         }
+        scoreEachRound.put(selectedName,sum);
         return sum;
     }
 
@@ -158,7 +166,7 @@ public class Game {
      * @param valueOfSelection value the user have selected
      * @return the sum of all non duplicated dices values in subsets equal to the users selection
      */
-    private int calculateNotLowSelected(int valueOfSelection) {
+    private int calculateNotLowSelected(int valueOfSelection, String nameOfSelection) {
         ArrayList<Dice> combinations = new ArrayList<>();
         notLowHelper(combinations, dices,valueOfSelection);
         /* Calculates the sum of all  verified subsets */
@@ -167,6 +175,7 @@ public class Game {
         }
         /* Removes all elements from the verified dices before next round */
         correctDices.clear();
+        scoreEachRound.put(nameOfSelection,sum);
         return sum;
     }
 

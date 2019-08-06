@@ -16,34 +16,21 @@ import java.util.*;
  */
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    /**
-     * @param mThrowButton button for initiating new dice throw and to go to ResultActivity after a game is finished
-     * @param mThrowCounter displays the current amount of throws
-     * @param mScoreCounter displays the current score
-     * @param mRoundCounter displays the current round
-     * @param game  instance of Game for handling dices
-     * @param seeResult boolean for enabling the throwbutton to redirect to the ResultActivity
-     * @param diceImages contains the drawable dice images
-     * @param diceButtonIDs contains the id for all dice ImageButtons in the xml file
-     * @param imageButtons contains imageButton for handling the imageButton ids int the xml file
-     * @param mSelectionSpinner holds the adapter and selectable values
-     * @param mSelectableValues stores the strings of the selectable values
-     * @param mAdapter  populates the spinner with the selectable values and sets the layout
-     * @param diceTextIDs stores the IDs for the textviews in the xml file associated to each dice ImageButton
-     * @param diceTexts handles display of text over the dice buttons when they are saved
-     * @param STATE_SCORE string for identifying the current score being stored/retrieved in savedInstanceState
-     * @param STATE_ROUND string for identifying the current round being stored/retrieved in savedInstanceState
-     * @param STATE_THROW string for identifying the current throw being stored/retrieved in savedInstanceState
-     * @param END_RESULT string for identifying the score value being passed to ResultActivity
-     * @param DICES_ARRAY string for identifying the arraylist of all current dices being stored/retrieved in savedInstanceState
-     */
+    /* Button for initiating new dice throw and to go to ResultActivity after a game is finished */
     private Button mThrowButton;
+    /* holds the adapter and selectable values */
     private Spinner mSelectionSpinner;
+    /* displays the current amount of throws */
     private TextView mThrowCounter;
+    /* displays the current score */
     private TextView mScoreCounter;
+    /* displays the current round */
     private TextView mRoundCounter;
+    /* instance of Game for handling dices */
     private Game game;
+    /* boolean for enabling the throwbutton to redirect to the ResultActivity */
     private boolean seeResult = false;
+    /* contains the drawable dice images reference */
     private int[] diceImages = {
             R.drawable.white1,
             R.drawable.white2,
@@ -52,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             R.drawable.white5,
             R.drawable.white6,
     };
+    /* contains the id for all dice ImageButtons in the xml file */
     private static final int[] diceButtonIDs = {
             R.id.dice_one,
             R.id.dice_two,
@@ -60,8 +48,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             R.id.dice_five,
             R.id.dice_six
     };
+    /* Holds imageButtons for handling the imageButton ids int the xml file */
     private ImageButton[] imageButtons = new ImageButton[diceButtonIDs.length];
-
+    /* Stores the IDs for the textviews in the xml file associated to each dice ImageButton */
     private int[] diceTextIDs = {
             R.id.dice1_text_display,
             R.id.dice2_text_display,
@@ -70,15 +59,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             R.id.dice5_text_display,
             R.id.dice6_text_display,
     };
+    /* For handling display of text over the dice buttons when they are saved */
     private TextView[] diceTexts = new TextView[diceTextIDs.length];
-
+    /* Stores the reference to strings of the selectable values */
     private ArrayList<String> mSelectableValues;
+    /* Populates the spinner with the selectable values and sets the layout */
     private ArrayAdapter<String> mAdapter;
-
+    /* string for identifying the current score being stored/retrieved in savedInstanceState */
     static final String STATE_SCORE = "currentScore";
+    /* string for identifying the current round being stored/retrieved in savedInstanceState */
     static final String STATE_ROUND = "currentRound";
+    /* string for identifying the current throw being stored/retrieved in savedInstanceState */
     static final String STATE_THROW = "currentThrow";
+    /* string for identifying the score value being passed to ResultActivity */
     static final String END_RESULT = "finalScore";
+    /* string for identifying the hashmap with score for each selection being passed to ResultActivity */
+    static final String STATE_SCORE_ROUND = "scoreEachRound";
+    /* string for identifying the arraylist of all current dices being stored/retrieved in savedInstanceState */
     static final String DICES_ARRAY = "dicesArrayList";
 
 
@@ -101,24 +98,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //initiates the selection spinner
         mSelectionSpinner = findViewById(R.id.selection_spinner);
-
-        //initiates and adds the string values available for selection
+        //initiates the list for selectable values
         mSelectableValues = new ArrayList<>();
-        mSelectableValues.add(getString(R.string.default_value));
-        mSelectableValues.add(getString(R.string.low_value));
-        mSelectableValues.add(getString(R.string.four_value));
-        mSelectableValues.add(getString(R.string.five_value));
-        mSelectableValues.add(getString(R.string.six_value));
-        mSelectableValues.add(getString(R.string.seven_value));
-        mSelectableValues.add(getString(R.string.eight_value));
-        mSelectableValues.add(getString(R.string.nine_value));
-        mSelectableValues.add(getString(R.string.ten_value));
-        mSelectableValues.add(getString(R.string.eleven_value));
-        mSelectableValues.add(getString(R.string.twelve_value));
+        addSelectableValues();
 
         //initiates the adapter, adds the selectable strings and sets the dropdown layout
         mAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item, mSelectableValues);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);//simple_spinner_dropdown_item
         mSelectionSpinner.setAdapter(mAdapter);
         mSelectionSpinner.setOnItemSelectedListener(this);
         mSelectionSpinner.setEnabled(false);
@@ -135,25 +121,59 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             }
         });
+        //initiates the text display for dices
+        addDicesTextDisplay();
+        //initiate diceImageButtons and add onClickListener
+        createDiceImageButtons();
 
-        //initiates and adds xml ID for all the textviews that displays if a dice is saved
+    }
+
+    /**
+     * adds the string values available for selection
+     */
+    private void addSelectableValues(){
+        mSelectableValues.add(getString(R.string.default_value));
+        mSelectableValues.add(getString(R.string.low_value));
+        mSelectableValues.add(getString(R.string.four_value));
+        mSelectableValues.add(getString(R.string.five_value));
+        mSelectableValues.add(getString(R.string.six_value));
+        mSelectableValues.add(getString(R.string.seven_value));
+        mSelectableValues.add(getString(R.string.eight_value));
+        mSelectableValues.add(getString(R.string.nine_value));
+        mSelectableValues.add(getString(R.string.ten_value));
+        mSelectableValues.add(getString(R.string.eleven_value));
+        mSelectableValues.add(getString(R.string.twelve_value));
+    }
+
+    /**
+     * initiates and adds xml ID for all the textviews that displays if a dice is saved
+     */
+    private void addDicesTextDisplay(){
         for(int id = 0; id < diceTextIDs.length; id++){
             diceTexts[id] = (TextView)findViewById(diceTextIDs[id]);
         }
-        //initiates the imagebuttons, adds their ID from the xml layout file and adds on click listener
-            for(int i = 0; i < diceButtonIDs.length; i++){
-                final int button = i;
-                imageButtons[button] = (ImageButton)findViewById(diceButtonIDs[button]);
-                imageButtons[button].setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        //for choosing to save or removing dice and to toggle color
-                        toggleImageButton(button);
-                    }
-                });
+    }
 
-            }
+    /**
+     * initiates the imagebuttons, adds their ID from the xml layout file and adds on click listener
+     */
+    private void createDiceImageButtons() {
+        for(int i = 0; i < diceButtonIDs.length; i++){
+            final int button = i;
+            imageButtons[button] = (ImageButton)findViewById(diceButtonIDs[button]);
+            //sets image to a dice for size porpuses
+            imageButtons[button].setImageResource(diceImages[0]);
+            //set the dice to not visible because no dices have been rolled jet
+            imageButtons[button].setVisibility(View.INVISIBLE);
+            imageButtons[button].setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //for choosing to save or removing dice and to toggle color
+                    toggleImageButton(button);
+                }
+            });
 
+        }
     }
 
 
@@ -194,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void goToResultView() {
         Intent resultIntent = new Intent(MainActivity.this,ResultActivity.class);
         resultIntent.putExtra(END_RESULT,game.getmScoreCounter());
+        resultIntent.putExtra(STATE_SCORE_ROUND,game.getScoreEachRound());
         startActivity(resultIntent);
         MainActivity.this.finish();
     }
@@ -207,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         savedInstanceState.putInt(STATE_SCORE, game.getmScoreCounter());
         savedInstanceState.putInt(STATE_ROUND, game.getmRoundCounter());
         savedInstanceState.putInt(STATE_THROW, game.getmThrowCounter());
+        savedInstanceState.putSerializable(STATE_SCORE_ROUND,game.getScoreEachRound());
         savedInstanceState.putParcelableArrayList(DICES_ARRAY,game.getDices());
 
         super.onSaveInstanceState(savedInstanceState);
@@ -214,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * @param savedInstanceState saved values to be restored when application is back in the foreground.
-     * retrieves state of throw, round, score and all dices being used
+     * retrieves state of throw, round, score, scoreEachSelection and all dices being used
      */
     public void onRestoreInstanceState (Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -222,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         game.setmScoreCounter(savedInstanceState.getInt(STATE_SCORE));
         game.setmRoundCounter(savedInstanceState.getInt(STATE_ROUND));
         game.setmThrowCounter(savedInstanceState.getInt(STATE_THROW));
-
+        game.setScoreEachRound((HashMap<String, Integer>) savedInstanceState.getSerializable(STATE_SCORE_ROUND));
         game.setDices(savedInstanceState.<Dice>getParcelableArrayList(DICES_ARRAY));
         updateCountersDisplay();
         updateDiceImages();
@@ -264,12 +286,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         //If the user have made a selection other then the default text: Select value
         if (position != 0) {
-            //score gets calculated by position +2 which correlates to the selected value
-            game.calculateScore(position + 2);
+            if(mSelectionSpinner.getSelectedItem().toString().contentEquals("Low")){
+                System.out.println("test av if");
+                game.calculateScore(3, mSelectableValues.get(position));
+            }else{
+                int selected = Integer.valueOf(mSelectableValues.get(position));
+                game.calculateScore(selected, mSelectableValues.get(position));
+            }
                 //score is increased
                 game.increasemScoreCounter();
                 //removes the text of the selected value
-                mSelectableValues.set(position, " ");
+                //mSelectableValues.set(position, " ");
+                //removes the selected value
+                mSelectableValues.remove(position);
                 //throw button sets to clickable again
                 mThrowButton.setClickable(true);
                 //the selection spinner sets to not clickable
@@ -302,11 +331,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     private void updateDiceImages() {
         int index = 0;
-        //sets the dice value according to its current value
+        //sets the dice value according to its current value and visible
         for(Dice dice: game.getDices()){
             int imageIndex = dice.getValue() -1;
             imageButtons[index] = findViewById(diceButtonIDs[index]);
             imageButtons[index].setImageResource(diceImages[imageIndex]);
+            imageButtons[index].setVisibility(View.VISIBLE);
             //updates the textview display related to each dice
             diceTexts[index] = findViewById(diceTextIDs[index]);
             if(dice.getClicked()){
@@ -318,11 +348,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     /**
-     * sets all imagebuttons related to dices image to empty
+     * sets all imagebuttons related to dices image to not visible
      */
     private void removeAllImageButtonDrawables(){
         for(ImageButton imageButton: imageButtons) {
-            imageButton.setImageResource(0);
+            //imageButton.setImageResource(0);
+            imageButton.setVisibility(View.INVISIBLE);
         }
     }
 
